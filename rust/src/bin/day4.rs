@@ -10,13 +10,12 @@ fn main() {
         .unwrap()
         .map_while(Result::ok)
         .collect();
-    part1(lines.clone());
-    part2(lines.clone());
+    part1(&lines);
+    part2(&lines);
 }
-fn find(xi: i32, yi: i32, lines: Vec<String>) -> i32 {
-    let mut c = 0;
+fn find(xi: i32, yi: i32, lines: &[String]) -> i32 {
     let directions = [
-        (1i32, 0i32),
+        (1, 0),
         (-1, 0),
         (0, 1),
         (0, -1),
@@ -25,30 +24,33 @@ fn find(xi: i32, yi: i32, lines: Vec<String>) -> i32 {
         (-1, 1),
         (-1, -1),
     ];
-    let max_y: i32 = lines.len() as i32 - 1;
-    let max_x: i32 = lines[0].len() as i32 - 1;
-    for (dx, dy) in directions {
-        let mut sub_str = "X".to_string();
-        let mut cx = xi;
-        let mut cy = yi;
-        for _ in 0..3 {
-            cx += dx;
-            cy += dy;
-            if !((0i32 <= cx && cx <= max_x) && (0i32 <= cy && cy <= max_y)) {
-                sub_str = "X".to_string();
-                break;
+    let max_y = lines.len() as i32 - 1;
+    let max_x = lines[0].len() as i32 - 1;
+    directions
+        .iter()
+        .filter_map(|&(dx, dy)| {
+            let mut cx = xi;
+            let mut cy = yi;
+            let mut sub_str = String::from("X");
+            for _ in 0..3 {
+                cx += dx;
+                cy += dy;
+                if !((0 <= cx && cx <= max_x) && (0 <= cy && cy <= max_y)) {
+                    return None;
+                }
+                sub_str.push(lines[cy as usize].chars().nth(cx as usize).unwrap());
             }
-            sub_str.push(lines[cy as usize].chars().nth(cx as usize).unwrap());
-        }
-        if sub_str == "XMAS" {
-            c += 1
-        }
-    }
-    c
+            if sub_str == "XMAS" {
+                Some(1)
+            } else {
+                None
+            }
+        })
+        .sum()
 }
-fn find2(xi: i32, yi: i32, lines: Vec<String>) -> i32 {
-    let max_y: i32 = lines.len() as i32 - 1;
-    let max_x: i32 = lines[0].len() as i32 - 1;
+fn find2(xi: i32, yi: i32, lines: &[String]) -> i32 {
+    let max_y = lines.len() as i32 - 1;
+    let max_x = lines[0].len() as i32 - 1;
 
     if !(((0 <= (xi + 1)) && ((xi + 1) <= max_x)) && ((0 <= (xi - 1)) && ((xi - 1) <= max_x))) {
         return 0;
@@ -56,50 +58,52 @@ fn find2(xi: i32, yi: i32, lines: Vec<String>) -> i32 {
     if !(((0 <= (yi + 1)) && ((yi + 1) <= max_y)) && ((0 <= (yi - 1)) && ((yi - 1) <= max_y))) {
         return 0;
     }
+    let mut diagonals = vec![];
 
-    let mut right_to_left = lines[(yi - 1) as usize]
-        .chars()
-        .nth((xi - 1) as usize)
-        .unwrap()
-        .to_string();
-    right_to_left.push(
+    diagonals.push((
+        lines[(yi - 1) as usize]
+            .chars()
+            .nth((xi - 1) as usize)
+            .unwrap(),
         lines[(yi + 1) as usize]
             .chars()
             .nth((xi + 1) as usize)
             .unwrap(),
-    );
-    let mut left_to_right = lines[(yi + 1) as usize]
-        .chars()
-        .nth((xi - 1) as usize)
-        .unwrap()
-        .to_string();
-    left_to_right.push(
+    ));
+    diagonals.push((
+        lines[(yi + 1) as usize]
+            .chars()
+            .nth((xi - 1) as usize)
+            .unwrap(),
         lines[(yi - 1) as usize]
             .chars()
             .nth((xi + 1) as usize)
             .unwrap(),
-    );
-    if (right_to_left.eq("MS") || right_to_left.chars().rev().collect::<String>().eq("MS"))
-        && (left_to_right.eq("MS") || left_to_right.chars().rev().collect::<String>().eq("MS"))
-    {
-        return 1;
+    ));
+
+    if diagonals.iter().all(|&(a, b)| {
+        let s: String = vec![a, b].into_iter().collect();
+        let reversed: String = s.chars().rev().collect();
+        s == "MS" || reversed == "MS"
+    }) {
+        1
+    } else {
+        0
     }
-    0
 }
 
-fn part1(lines: Vec<String>) {
+fn part1(lines: &[String]) {
     let ans: i32 = lines
-        .clone()
-        .into_iter()
+        .iter()
         .enumerate()
         .map(|(yi, line)| {
             line.chars()
                 .enumerate()
                 .map(|(xi, ch)| {
                     if ch == 'X' {
-                        find(xi as i32, yi as i32, lines.clone())
+                        find(xi as i32, yi as i32, lines)
                     } else {
-                        0_i32
+                        0
                     }
                 })
                 .sum::<i32>()
@@ -107,17 +111,16 @@ fn part1(lines: Vec<String>) {
         .sum();
     println!("pt1: {}", ans);
 }
-fn part2(lines: Vec<String>) {
+fn part2(lines: &[String]) {
     let ans: i32 = lines
-        .clone()
-        .into_iter()
+        .iter()
         .enumerate()
         .map(|(yi, line)| {
             line.chars()
                 .enumerate()
                 .map(|(xi, ch)| {
                     if ch == 'A' {
-                        find2(xi as i32, yi as i32, lines.clone())
+                        find2(xi as i32, yi as i32, lines)
                     } else {
                         0_i32
                     }
