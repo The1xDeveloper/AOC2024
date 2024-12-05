@@ -39,7 +39,11 @@ def part2(lines):
     for line in lines:
         if "|" in line:
             a, b = line.split("|")
-            in_degrees[int(b)].add(int(a))
+            a, b = int(a), int(b)
+            if b in in_degrees:
+                in_degrees[b].add(a)
+            else:
+                in_degrees[b] = {a}
             graph[a].append(b)
             graph[b].append(a)
         elif "," in line:
@@ -58,7 +62,6 @@ def part2(lines):
         if must_fix:
             game_set = set(game)
             l = {a: game_set.intersection(in_degrees.get(a, set())) for a in game_set}
-            # should always be just one zero or else isnt unique, but maybe middle elm is always unique? idk
             zeros = deque([a for a, b in l.items() if b == set()])
             new_game = []
             while zeros:
@@ -74,6 +77,7 @@ def part2(lines):
                 zeros = new_zeros
             ans += new_game[len(new_game) // 2]
 
+        # 5576 too high...
     return ans
 
 
