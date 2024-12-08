@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::cmp;
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -115,40 +116,65 @@ fn part2(lines: &[String]) {
     let mut origin: (i32, i32) = (1, 1);
     let mut ans: i32 = 0;
 
-    lines.iter().for_each(|line| {
-        let cs: Vec<char> = line.chars().collect();
+    lines.iter().enumerate().for_each(|(i, line)| {
+        let cs: Vec<char> = line
+            .chars()
+            .enumerate()
+            .map(|(j, ch)| {
+                if ch == '^' {
+                    origin = (j as i32, i as i32);
+                }
+                ch
+            })
+            .collect();
         graph2.push(cs);
     });
-    lines.iter().enumerate().for_each(|(yi, line)| {
-        line.chars().enumerate().for_each(|(xi, c)| {
-            if c == '^' {
-                origin = (xi as i32, yi as i32);
-                potentials = bfspt2(xi as i32, yi as i32, lines)
+    let potentials = lines
+        .par_iter()
+        .enumerate()
+        .flat_map(|(yi, line)| {
+            line.chars()
+                .enumerate()
+                .filter_map(|(xi, c)| {
+                    if c == '^' {
+                        Some(bfspt2(xi as i32, yi as i32, lines))
+                    } else {
+                        None
+                    }
+                })
+                .flatten()
+                .collect::<Vec<_>>()
+        })
+        .collect::<HashSet<_>>();
+    let ans: i32 = potentials
+        .par_iter()
+        .filter_map(|(ox, oy)| {
+            if (*ox, *oy) != origin {
+                let mut local_graph2 = graph2.clone();
+                {
+                    let mut t = local_graph2
+                        .get_mut(*oy as usize)
+                        .unwrap()
+                        .get_mut(*ox as usize)
+                        .unwrap();
+                    *t = '#';
+                }
+                let t = bfs_find_cycle(origin, &local_graph2);
+
+                {
+                    let mut t = local_graph2
+                        .get_mut(*oy as usize)
+                        .unwrap()
+                        .get_mut(*ox as usize)
+                        .unwrap();
+                    *t = '.';
+                }
+                Some(t)
+            } else {
+                None
             }
         })
-    });
-    potentials.iter().for_each(|(ox, oy)| {
-        if (*ox, *oy) != origin {
-            {
-                let mut t = graph2
-                    .get_mut(*oy as usize)
-                    .unwrap()
-                    .get_mut(*ox as usize)
-                    .unwrap();
-                *t = '#';
-            }
-            ans += bfs_find_cycle(origin, &graph2);
-
-            {
-                let mut t = graph2
-                    .get_mut(*oy as usize)
-                    .unwrap()
-                    .get_mut(*ox as usize)
-                    .unwrap();
-                *t = '.';
-            }
-        }
-    });
+        .sum();
     println!("pt2: {}", ans);
 }
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
