@@ -29,32 +29,43 @@ def part1b(line):
 
     l = 0
     r = len(t) - 1
-    while l <= r:
-        if t[l] == ".":
+    # print(t)
+    while t[r] == ".":
+        r -= 1
+    for i in range(len(t)):
+        if t[i] == ".":
+            t[i], t[r] = t[r], t[i]
             while t[r] == ".":
                 r -= 1
-            t[l], t[r] = t[r], t[l]
-            r -= 1
-            l += 1
-        else:
-            l += 1
-            while t[r] == ".":
-                r -= 1
+        if i >= r:
+            break
 
-    l = 0
-    r = len(t) - 1
-    while l <= r:
-        if t[l] == ".":
-            while t[r] == ".":
-                r -= 1
-            t[l], t[r] = t[r], t[l]
-            r -= 1
-            l += 1
-        else:
-            l += 1
-            if t[r] == ".":
-                r -= 1
-
+    # while l <= r:
+    #     if t[l] == ".":
+    #         while t[r] == ".":
+    #             r -= 1
+    #         t[l], t[r] = t[r], t[l]
+    #         r -= 1
+    #         l += 1
+    #     else:
+    #         l += 1
+    #         while t[r] == ".":
+    #             r -= 1
+    #
+    # l = 0
+    # r = len(t) - 1
+    # while l <= r:
+    #     if t[l] == ".":
+    #         while t[r] == ".":
+    #             r -= 1
+    #         t[l], t[r] = t[r], t[l]
+    #         r -= 1
+    #         l += 1
+    #     else:
+    #         l += 1
+    #         if t[r] == ".":
+    #             r -= 1
+    #
     # print(q)
     # print(t[q : q + 10])
     # t[q], t[q + 1] = t[q + 1], t[q]
