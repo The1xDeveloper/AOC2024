@@ -6,14 +6,24 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use std::time::Instant;
 
 fn main() {
     let lines: Vec<String> = read_lines("../inputs/day8.txt")
         .unwrap()
         .map_while(Result::ok)
         .collect();
+    let start = Instant::now();
     part1(&lines);
     part2(&lines);
+    let duration = start.elapsed();
+    println!(
+        "Time taken no i/o: {} seconds and {} nanos and {} millis and {} micros",
+        duration.as_secs(),
+        duration.as_nanos(),
+        duration.as_millis(),
+        duration.as_micros()
+    )
 }
 
 fn is_in_bounds(xi: i32, yi: i32, max_x: i32, max_y: i32) -> bool {
