@@ -3,7 +3,7 @@ import heapq
 from collections import deque, defaultdict, Counter
 
 
-input = open("../../inputs/day12.txt").read().splitlines()
+input = open("../../inputs/day12.test").read().splitlines()
 
 
 def is_in_bounds(point, max_x, max_y):
@@ -103,37 +103,52 @@ def part2(lines):
                 # as an edge, tried playing around with if I had > 1 el but that fails below:
                 # A
                 # A
+                # for dx, dy in directions:
+                #     px = cx + dx
+                #     py = cy + dy
+                #     if px in y_to_x[py]:
+                #         y_to_x[py].remove(px)
+                #     else:
+                #         y_to_x[py].add(px)
+                #     if py in x_to_y[px]:
+                #         x_to_y[px].remove(py)
+                #     else:
+                #         x_to_y[px].add(py)
+                #     if is_in_bounds((px, py), max_x, max_y) and lines[py][px] == target:
+                #         if (px, py) not in seen:
+                #             seen.add((px, py))
+                #             q.append((px, py))
                 for dx, dy in directions:
                     px = cx + dx
                     py = cy + dy
-                    if px in y_to_x[py]:
-                        y_to_x[py].remove(px)
-                    else:
+                    if dx == 0 and not ((0 <= py <= max_y) and lines[py][px] == target):
                         y_to_x[py].add(px)
-                    if py in x_to_y[px]:
-                        x_to_y[px].remove(py)
-                    else:
+                    elif (
+                        not ((0 <= px <= max_x) and lines[py][px] == target) and dy == 0
+                    ):
                         x_to_y[px].add(py)
                     if is_in_bounds((px, py), max_x, max_y) and lines[py][px] == target:
                         if (px, py) not in seen:
                             seen.add((px, py))
                             q.append((px, py))
-            # sides = 0
-            # for y, xs in y_to_x.items():
-            #     if y == yi or len(xs) <= 1:
-            #         continue
-            #     print(y, xs)
-            #     for x in xs:
-            #         if x + 1 not in xs:
-            #             sides += 1
-            # print("***")
-            # for x, ys in x_to_y.items():
-            #     if x == xi or len(ys) == 1:
-            #         continue
-            #     print(x, ys)
-            #     for y in ys:
-            #         if y + 1 not in ys:
-            #             sides += 1
+            sides = 0
+            print(y_to_x)
+            print(x_to_y)
+            for y, xs in y_to_x.items():
+                # if y == yi or len(xs) <= 1:
+                #     continue
+                # print(y, xs)
+                for x in xs:
+                    if x + 1 not in xs:
+                        sides += 1
+            print("***")
+            for x, ys in x_to_y.items():
+                # if x == xi or len(ys) == 1:
+                #     continue
+                # print(x, ys)
+                for y in ys:
+                    if y + 1 not in ys:
+                        sides += 1
             # verts = sum(1 for x in point_count.values() if x == 1)
 
             # print(c, area)
@@ -177,7 +192,8 @@ def part2(lines):
                     + right_down_diag
                 )
 
-            l.append(corners * area)
+            print(target, sides, corners)
+            l.append(sides * area)
     return sum(l)
 
 
