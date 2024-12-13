@@ -3,7 +3,6 @@ import sys
 import heapq
 import math
 from collections import deque, defaultdict, Counter
-import numpy as np
 
 
 input = open("../../inputs/day13.txt").read().splitlines()
@@ -14,45 +13,61 @@ def is_in_bounds(point, max_x, max_y):
 
 
 def is_int(a):
-    b = math.floor(a)
+    b = math.floor(a + 0.5)
     # print(a, b, abs(a - b), sys.float_info.epsilon)
-    return abs(a - b) < 0.0001 or ((1 - abs(a - b)) < 0.0001)
+    return abs(a - b) < 0.001
+
+
+"""
+    x1 * X + x2 * Y = A
+y1 * X + y2 * Y = B
+
+x1 * X = A - (x2 * Y)
+X = (A - (x2 * Y))/x1
+X = A/x1 - (x2/x1) * Y
+
+
+y1 * (A/x1 - (x2/x1) * Y) + y2 * Y = B
+(y1 * A)/x1 - ((y1 * x2)/x1) * Y + y2 * Y = B
+
+-((y1 * x2)/x1) * Y + y2 * Y = B - (y1 * A)/x1
+
+Y * (-((y1 * x2)/x1)  + y2) = B - (y1 * A)/x1
+Y = (B - (y1 * A)/x1)/ ((-((y1 * x2)/x1)  + y2))
+
+
+x1 * X = A - (x2 * Y)
+
+X = (A - (x2 * Y))/x1
+"""
 
 
 def part1(lines):
     start_idx = 0
     ans = 0
-    good_math = set()
-    good_search = set()
     while start_idx <= len(lines) - 4:
         # print(lines[start_idx])
         btn_a = lines[start_idx]
         matches = re.findall(r"X\+(\d+),\s*Y\+(\d+)", btn_a)
         btn_a = [(int(a), int(b)) for a, b in matches][0]
+        x1 = btn_a[0]
+        y1 = btn_a[1]
 
         btn_b = lines[start_idx + 1]
         matches = re.findall(r"X\+(\d+),\s*Y\+(\d+)", btn_b)
         btn_b = [(int(a), int(b)) for a, b in matches][0]
+        x2 = btn_b[0]
+        y2 = btn_b[1]
         target = lines[start_idx + 2]
         matches = re.findall(r"X=(\d+),\s*Y=(\d+)", target)
         target = [(int(a), int(b)) for a, b in matches][0]
-        a = np.array([[btn_a[0], btn_b[0]], [btn_a[1], btn_b[1]]])
-        b = np.array([target[0], target[1]])
-        res = np.linalg.solve(a, b)
-        if start_idx == 4:
-            print(res)
-        if is_int(res[0]) and is_int(res[1]):
-            if start_idx == 4:
-                print(res)
-            # print("good: ", res)
-            good_math.add(start_idx)
-            ans += res[0] * 3 + res[1]
-        else:
-            if start_idx == 4:
-                print(is_int(res[0]), is_int(res[1]))
-                t = math.floor(res[0])
-                # print(a, b, abs(a - b), sys.float_info.epsilon)
-                print(abs(res[0] - t))
+        A = target[0]
+        B = target[1]
+
+        Y = (B - (y1 * A) / x1) / (-((y1 * x2) / x1) + y2)
+        X = (A - (x2 * Y)) / x1
+        if is_int(Y) and is_int(X):
+            ans += int(X) * 3 + int(Y)
 
         start_idx += 4
         #    cost, sub_total_x, sub_total_y
@@ -100,21 +115,27 @@ def part2(lines):
         btn_a = lines[start_idx]
         matches = re.findall(r"X\+(\d+),\s*Y\+(\d+)", btn_a)
         btn_a = [(int(a), int(b)) for a, b in matches][0]
+        x1 = btn_a[0]
+        y1 = btn_a[1]
 
         btn_b = lines[start_idx + 1]
         matches = re.findall(r"X\+(\d+),\s*Y\+(\d+)", btn_b)
         btn_b = [(int(a), int(b)) for a, b in matches][0]
+        x2 = btn_b[0]
+        y2 = btn_b[1]
         target = lines[start_idx + 2]
         matches = re.findall(r"X=(\d+),\s*Y=(\d+)", target)
         target = [
             (int(a) + 10000000000000, int(b) + 10000000000000) for a, b in matches
         ][0]
-        a = np.array([[btn_a[0], btn_b[0]], [btn_a[1], btn_b[1]]])
-        b = np.array([target[0], target[1]])
-        res = np.linalg.solve(a, b)
-        if is_int(res[0]) and is_int(res[1]):
-            # print("good: ", res)
-            ans += res[0] * 3 + res[1]
+        A = target[0]
+        B = target[1]
+
+        Y = (B - (y1 * A) / x1) / (-((y1 * x2) / x1) + y2)
+        if is_int(Y):
+            X = (A - (x2 * Y)) / x1
+            if is_int(X):
+                ans += X * 3 + Y
         start_idx += 4
     return ans
 
