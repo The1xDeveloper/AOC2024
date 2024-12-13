@@ -18,6 +18,7 @@ fn is_in_bounds(xi: i32, yi: i32, max_x: i32, max_y: i32) -> bool {
 }
 
 fn part1(lines: &[String]) {
+    println!("hasfd");
     let mut stones: Vec<i64> = lines
         .first()
         .unwrap()
@@ -53,9 +54,9 @@ fn part2(lines: &[String]) {
     for stone in stones {
         *m.entry(stone).or_insert(0) += 1;
     }
-    for _ in 0..75 {
+    let z = (0..75).fold(m, |acc, i| {
         let mut new_stones: HashMap<i64, i64> = HashMap::new();
-        for (stone, num) in m.iter() {
+        for (stone, num) in acc.iter() {
             if *stone == 0 {
                 *new_stones.entry(1).or_insert(0) += num;
             } else if stone.to_string().len() % 2 == 0 {
@@ -70,9 +71,9 @@ fn part2(lines: &[String]) {
                 *new_stones.entry(y).or_insert(0) += num;
             }
         }
-        m = new_stones;
-    }
-    println!("pt2: {}", m.values().sum::<i64>());
+        new_stones
+    });
+    println!("pt2: {}", z.values().sum::<i64>());
 }
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where

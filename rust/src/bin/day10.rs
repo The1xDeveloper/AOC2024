@@ -41,6 +41,16 @@ fn part2(lines: &[String]) -> i64 {
     }
     ans
 }
+fn get_digit(py: i32, px: i32, lines: &[String]) -> u32 {
+    lines
+        .get(py as usize)
+        .unwrap()
+        .chars()
+        .nth(px as usize)
+        .unwrap()
+        .to_digit(10)
+        .unwrap()
+}
 
 fn bfs(xi: i32, yi: i32, lines: &[String]) -> i64 {
     let directions = [(1, 0), (-1, 0), (0, -1), (0, 1)];
@@ -58,22 +68,8 @@ fn bfs(xi: i32, yi: i32, lines: &[String]) -> i64 {
             let px = dx + cx;
             let py = dy + cy;
             if !seen.contains(&(px, py)) && is_in_bounds(px, py, max_x, max_y) {
-                let p = lines
-                    .get(py as usize)
-                    .unwrap()
-                    .chars()
-                    .nth(px as usize)
-                    .unwrap()
-                    .to_digit(10)
-                    .unwrap();
-                let c = lines
-                    .get(cy as usize)
-                    .unwrap()
-                    .chars()
-                    .nth(cx as usize)
-                    .unwrap()
-                    .to_digit(10)
-                    .unwrap();
+                let p = get_digit(py, px, lines);
+                let c = get_digit(cy, cx, lines);
 
                 let is_p_inc = p == (c + 1);
                 if is_p_inc {
@@ -104,23 +100,8 @@ fn bfs2(xi: i32, yi: i32, lines: &[String]) -> i64 {
             let px = dx + cx;
             let py = dy + cy;
             if is_in_bounds(px, py, max_x, max_y) {
-                let p = lines
-                    .get(py as usize)
-                    .unwrap()
-                    .chars()
-                    .nth(px as usize)
-                    .unwrap()
-                    .to_digit(10)
-                    .unwrap();
-                let c = lines
-                    .get(cy as usize)
-                    .unwrap()
-                    .chars()
-                    .nth(cx as usize)
-                    .unwrap()
-                    .to_digit(10)
-                    .unwrap();
-
+                let p = get_digit(py, px, lines);
+                let c = get_digit(cy, cx, lines);
                 let is_p_inc = p == c + 1;
                 if !is_p_inc {
                     continue;
