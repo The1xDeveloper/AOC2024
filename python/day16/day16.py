@@ -22,31 +22,23 @@ def is_int(a):
 def dikstras(start, end, graph):
     #    cost, currpoint
     h = [(0, start, (1, 0), [start])]
-    prev = defaultdict(set)
     node_track = defaultdict(lambda: 1e999)
 
     all_seen = set()
     m = 1e99
-    c = 0
     while h:
         cost, curr_point, curr_dir, curr_path = heapq.heappop(h)
         if node_track[(curr_point, curr_dir)] < cost:
             continue
         node_track[(curr_point, curr_dir)] = cost
 
+        if cost > m:
+            continue
 
         if curr_point == end:
             for zzz in curr_path:
                 all_seen.add(zzz)
-            c += 1
             m = min(m, cost)
-            if cost > m:
-                # print(prev)
-                return cost, prev
-            else:
-                pass
-        if cost > m:
-            continue
 
         next_striaght = (curr_point[0] + curr_dir[0], curr_point[1] + curr_dir[1])
         if graph[next_striaght[1]][next_striaght[0]] != "#" and next_striaght not in set(curr_path):
