@@ -26,15 +26,6 @@ fn main() {
         duration.as_micros()
     );
     let start = Instant::now();
-    let duration = start.elapsed();
-    println!(
-        "Time taken no i/o: {} seconds and {} nanos and {} millis and {} micros",
-        duration.as_secs(),
-        duration.as_nanos(),
-        duration.as_millis(),
-        duration.as_micros()
-    );
-    let start = Instant::now();
     part2(&lines);
     let duration = start.elapsed();
     println!(
@@ -44,15 +35,6 @@ fn main() {
         duration.as_millis(),
         duration.as_micros()
     );
-    let start = Instant::now();
-    let duration = start.elapsed();
-    println!(
-        "Time taken no i/o: {} seconds and {} nanos and {} millis and {} micros",
-        duration.as_secs(),
-        duration.as_nanos(),
-        duration.as_millis(),
-        duration.as_micros()
-    )
 }
 fn is_in_bounds(xi: i32, yi: i32, max_x: i32, max_y: i32) -> bool {
     (0 <= xi && xi <= max_x) && (0 <= yi && yi <= max_y)
