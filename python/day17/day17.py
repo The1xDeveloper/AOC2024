@@ -95,13 +95,74 @@ def part1(lines):
 
     return ans
 
-def part2(lines):
-    ans = 0
-    for yi, line in enumerate(lines):
-        for xi, ch in enumerate(line):
-            pass
+def play(program, left, ans: int):
+    if not left:
+        return ans
+    max_i = len(program)
+    A = 0
+    B = 0
+    C = 0
 
-    return ans
+    for t in range(8):
+        output = 0
+        tmp = ans << 3 | t
+        A = ans << 3 | t
+        i = 0
+        while i < max_i - 1:
+            opcode = program[i]
+            operand = program[i+1]
+
+            if opcode == 0:
+                num = A
+                comb = get_combo_operand(operand, A, B, C)
+                den = 2**comb
+                A = num//den
+            if opcode == 1:
+                B = B ^ operand
+            if opcode == 2:
+                B = get_combo_operand(operand, A, B, C) % 8
+                assert B != -1
+            if opcode == 3:
+                if A != 0:
+                    i = operand
+                    continue
+            if opcode == 4:
+                B = B ^ C
+            if opcode == 5:
+                t = get_combo_operand(operand, A, B, C) % 8
+                output = t
+                break
+                # outputs.append(t)
+            if opcode == 6:
+                num = A
+                comb = get_combo_operand(operand, A, B, C)
+                den = 2**comb
+                B = num//den
+            if opcode == 7:
+                num = A
+                comb = get_combo_operand(operand, A, B, C)
+                den = 2**comb
+                C = num//den
+            i += 2
+        if output == left[-1]:
+            sub = play(program, left[:-1], tmp)
+            if sub is None: continue
+            return sub
+
+def part2(lines):
+    program = []
+
+    for yi, line in enumerate(lines):
+        if line.startswith("Register A"):
+            A = int(line.split(":")[-1])
+        if line.startswith("Register B"):
+            B = int(line.split(":")[-1])
+        if line.startswith("Register C"):
+            C = int(line.split(":")[-1])
+        if line.startswith("Program"):
+            program = [int(x) for x in line.split(":")[-1].split(",")]
+        
+    return play(program, program, 0)
 
 
 
