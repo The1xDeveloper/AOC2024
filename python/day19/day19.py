@@ -29,6 +29,7 @@ class A:
     def backtrack(self, word):
         if not word:
             return 1
+        # return any(self.backtrack(word[len(t):]) for t in self.towels if word.startswith(t))
         for t in self.towels:
             if word.startswith(t):
                 can_make = self.backtrack(word[len(t):])
@@ -47,6 +48,7 @@ class B:
     def backtrack(self, word):
         if not word:
             return 1
+        # return sum(self.backtrack(word[len(t):]) for t in self.towels if word.startswith(t))
         sub_s = 0
         for t in self.towels:
             if word.startswith(t):
