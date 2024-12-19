@@ -145,9 +145,8 @@ def play(program, left, ans: int):
                 C = num//den
             i += 2
         if output == left[-1]:
-            sub = play(program, left[:-1], tmp)
-            if sub is None: continue
-            return sub
+            if sub := play(program, left[:-1], tmp):
+                return sub
 
 def part2(lines):
     program = []
