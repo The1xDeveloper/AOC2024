@@ -36,7 +36,6 @@ def np_bfs2(start, target):
     q = deque([])
     #         node, path, dir path
     q.append((start, [], ""))
-    i = 0
     paths_to_target = defaultdict(list)
     min_found = defaultdict(lambda: 1e999)
     while q:
@@ -530,6 +529,28 @@ def part1b(lines):
     # print(ans2)
     return ans
 
+def part(lines, r=2):
+    ans = 0
+
+    for yi, line in enumerate(lines):
+        line = line.strip()
+        with_a = "A" + line
+        s = 0
+        for a, b in zip(with_a, with_a[1:]):
+            num_short = np_bfs2(fi(a), b)
+            min_found = 1e999
+            for num in num_short:
+                num = "A" + num
+                tmp = 0
+                for a, b in zip(num, num[1:]):
+                    tmp += dfs2(a, b, r)
+                min_found = min(min_found, tmp)
+            s += min_found
+
+        ans += s * int(line[:-1])
+
+    return ans
+
 def part1(lines):
     ans = 0
 
@@ -651,6 +672,6 @@ def part2(lines):
     return ans
 
 
-print("ans pt1:", part1b(i))
+print("ans pt1:", part(i, r=2))
 print("***********part 2***************")
-# print(part2(i))
+print(part(i, r=25))
