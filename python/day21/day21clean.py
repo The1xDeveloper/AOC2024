@@ -18,7 +18,7 @@ np = [
 ]
 
 
-def np_bfs2(start, target):
+def np_bfs(start, target):
     directions = {
         "^": (0, -1),
         "v": (0, 1),
@@ -51,18 +51,6 @@ def np_bfs2(start, target):
         tmp_path = p1 + "A"
         all_paths.append(tmp_path)
     return all_paths
-
-
-
-@cache
-def dfs2(f, to, time):
-    if time == 1:
-        return len(test[f][to] + "A")
-    next_str = "A" + test[f][to] + "A"
-    sub_s = 0
-    for a, b in zip(next_str, next_str[1:]):
-        sub_s += dfs2(a, b, time -1)
-    return sub_s
 
 
 test = {
@@ -104,29 +92,18 @@ test = {
 }
 
 
-
-
-def is_in_bounds(point, max_x, max_y):
-    return (0 <= point[0] <= max_x) and (0 <= point[1] <= max_y)
-
-
-def is_int(a):
-    b = math.floor(a + 0.5)
-    # print(a, b, abs(a - b), sys.float_info.epsilon)
-    return abs(a - b) < 0.001
-
-def fi(ch):
+def fi(to_find):
     for yi, line in enumerate(np):
-        for xi, qqq in enumerate(line):
-            if qqq == ch:
+        for xi, ch in enumerate(line):
+            if ch == to_find:
                 return (xi, yi)
     return -1
 
 @cache
 def dfs(f, to, time):
-    if time == 0:
+    if time == 1:
         return len(test[f][to]) + 1
-    next_str = test[f][to] + "A"
+    next_str = "A" + test[f][to] + "A"
     sub_s = 0
     for a, b in zip(next_str, next_str[1:]):
         sub_s += dfs(a, b, time - 1)
@@ -141,13 +118,13 @@ def part(lines, r=2):
         with_a = "A" + line
         s = 0
         for a, b in zip(with_a, with_a[1:]):
-            num_short = np_bfs2(fi(a), b)
+            num_short = np_bfs(fi(a), b)
             min_found = 1e999
             for num in num_short:
                 num = "A" + num
                 tmp = 0
                 for a, b in zip(num, num[1:]):
-                    tmp += dfs2(a, b, r)
+                    tmp += dfs(a, b, r)
                 min_found = min(min_found, tmp)
             s += min_found
 
