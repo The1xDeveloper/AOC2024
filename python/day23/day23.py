@@ -60,7 +60,6 @@ def are_all_connected(nodes, adj):
 
 def part2(lines):
     adj = defaultdict(set)
-    ans = 0
     ts = set()
     for yi, line in enumerate(lines):
         a, b = line.split("-")
@@ -68,42 +67,33 @@ def part2(lines):
         b = b.strip()
         adj[a].add(b)
         adj[b].add(a)
-        if a.startswith("t"):
-            ts.add(a)
-        if b.startswith("t"):
-            ts.add(b)
-    ans_set = set()
-    potential_answers = list()
-    adj_copy = adj.copy()
     m = defaultdict(int)
-    for k, v in adj_copy.items():
+    max_set_len = 0
+    for k, v in adj.items():
         candidate = v | {k}
         q = deque([])
-        q.append((k, candidate))
+        q.append(candidate)
         seen = set()
         seen.add(k)
         while q:
-            prev, current_candidate = q.popleft()
+            current_candidate = q.popleft()
+            if len(current_candidate) < max_set_len:
+                continue
 
-            has_added = False
             for nei in current_candidate:
                 next_candidate = adj[nei] | {nei}
                 c = next_candidate & current_candidate
                 m[frozenset(c)] += 1
-                # print("nei: ", nei, "c: ", c)
-                if c and nei not in seen:
-                    q.append((nei, c))
+                max_set_len = max(max_set_len, len(c))
+                if c and nei not in seen and len(c) >= max_set_len:
+                    q.append(c)
                     seen.add(nei)
-                    has_added = True
 
-            if not has_added:
-                potential_answers.append(current_candidate)
     max_m = max([v for k, v in m.items()])
     z = [x for x, v in m.items() if v == max_m]
     print("=================")
-    print(','.join(sorted(list(z[0]))))
+    return ','.join(sorted(list(z[0])))
 
-    return len(ans_set)
 
 print("ans pt1:", part1(i))
 print("***********part 2***************")
